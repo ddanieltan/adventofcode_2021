@@ -1,6 +1,5 @@
 #%%
 from typing import List, Tuple
-from dataclasses import dataclass
 
 def parse(s:str) -> List[Tuple]:
     """
