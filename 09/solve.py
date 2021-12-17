@@ -2,12 +2,16 @@
 import dataclasses
 from typing import List, Tuple
 from dataclasses import dataclass
+from collections import deque
 # %%
 @dataclass
 class Point:
     x : int
     y : int
     h : int # height
+
+    def __hash__(self):
+        return hash((self.x, self.y))
 
 @dataclass
 class Map:
@@ -47,11 +51,53 @@ class Map:
         """
         Given a starting Point, return list of Points of all
         adjacent Points not 9
+        and not out of bounds
         """
-        explored = []
-        moves = 
+        max_y = len(self.map)-1
+        max_x = len(self.map[0])-1
+        ret = []
+        
+        if (starting.y - 1 >= 0): # Up (-1, 0)
+            point = self.map[starting.y-1][starting.x]
+            if point.h < 9:
+                ret.append(point)
+        if (starting.y + 1 <= max_y): # Down (1, 0)
+            point = self.map[starting.y+1][starting.x]
+            if point.h < 9:
+                ret.append(point)
+        if (starting.x-1 >= 0): # Left (0, -1)
+            point = self.map[starting.y][starting.x-1]
+            if point.h < 9:
+                ret.append(point)
+        if (starting.x+1 <= max_x): # Right (0, 1)
+            point = self.map[starting.y][starting.x+1]
+            if point.h < 9:
+                ret.append(point)
+        
+        return ret
     
-    def largest_basins(self) -> int:
+    def find_basin(self, starting:Point):
+        """
+        Given a starting point, return all points within that basin
+        """
+        basin = []
+        queue = deque([starting])
+        explored = set()
+
+        while queue:
+            point = queue.pop()
+            if point in explored:
+                continue
+            else:
+                explored.add(point)
+                basin.append(point)
+                neighbours = self.get_basin_points(point)
+                for n in neighbours:
+                    queue.append(n)
+        return basin
+
+
+    def part2(self) -> int:
         """
         Start with list of lowest Points
         For each point, log explored, compare if adjacent point is 9
@@ -61,25 +107,15 @@ class Map:
         Collect list of basins with sizes
         Return product of top 3 largest basins
         """
-
-        lowest_points = self.low_points()
-        frontier = [] # List of Points to explore
-        explored = [] # List of Points already explored
         all_basins = []
-        current_basin = []
-       
-        for point in lowest_points:
-            if point in explored:
-                continue
-            else:
-            
-            
-            if point.h < 9:
-                current_basin.append(point)
-                explored.append(point)
+        lowest_points = self.low_points()
+        for p in lowest_points:
+            all_basins.append(self.find_basin(p))
+        all_basins.sort(key=len,reverse=True)
 
-
-        return
+        return len(all_basins[0]) \
+             * len(all_basins[1]) \
+             * len(all_basins[2])
 
 
 #%%
@@ -111,6 +147,11 @@ eg = """2199943210
 m = parse(eg)
 m.low_points()
 
+#%%
+p = Point(x=2,y=2,h=2)
+# m.find_basin(p)
+# m.get_basin_points(p)
+m.part2()
 #%% 
 with open("input.txt","r") as f:
     m = parse(f.read())
@@ -121,5 +162,8 @@ ret = 0
 for point in low_points:
     ret += (point.h + 1)
 print(ret)
+
+# %%
+m.part2()
 
 # %%
