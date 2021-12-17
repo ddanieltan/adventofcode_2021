@@ -9,24 +9,15 @@ class Point:
     y : int
     h : int # height
 
-    def get_adjacent_xy(self) -> List[Tuple[int,int]]:
-        """
-        Returns List of (x,y) valid adjacent points
-        """
-        ret = []
-
-        
-
 @dataclass
 class Map:
     map : List[List[Point]]
 
-    def search(self) -> int:
+    def low_points(self) -> int:
         """
         Find the dimensions of the map
         Iterate through every Point and compare against adjacent Points
-        Record low Points
-        Return sum of (low points +1)
+        Return low points
         """
         max_y = len(self.map)-1
         max_x = len(self.map[0])-1
@@ -50,11 +41,45 @@ class Map:
                 if all(p.h < adj.h for adj in comparisons):
                     low_points.append(p)
         
-        ret = 0
-        for point in low_points:
-            ret += (point.h + 1)
-        return ret
+        return low_points
+    
+    def get_basin_points(self, starting:Point) -> List[Point]:
+        """
+        Given a starting Point, return list of Points of all
+        adjacent Points not 9
+        """
+        explored = []
+        moves = 
+    
+    def largest_basins(self) -> int:
+        """
+        Start with list of lowest Points
+        For each point, log explored, compare if adjacent point is 9
+        If not, add to Points to frontier
+        Stop when no more points to explore
 
+        Collect list of basins with sizes
+        Return product of top 3 largest basins
+        """
+
+        lowest_points = self.low_points()
+        frontier = [] # List of Points to explore
+        explored = [] # List of Points already explored
+        all_basins = []
+        current_basin = []
+       
+        for point in lowest_points:
+            if point in explored:
+                continue
+            else:
+            
+            
+            if point.h < 9:
+                current_basin.append(point)
+                explored.append(point)
+
+
+        return
 
 
 #%%
@@ -79,20 +104,22 @@ def parse(s:str) -> Map:
             
 eg = """2199943210
 3987894921
-9856789892q
+9856789892
 8767896789
 9899965678"""
 
 m = parse(eg)
-m.search()
-
-
+m.low_points()
 
 #%% 
 with open("input.txt","r") as f:
     m = parse(f.read())
 
 # %% Part 1
-m.search()
+low_points = m.low_points()
+ret = 0
+for point in low_points:
+    ret += (point.h + 1)
+print(ret)
 
 # %%
